@@ -2,8 +2,6 @@
 
 ## Screenshots
 
-![Main Screen](static/Main_screen.png)
-
-![Alice](static/Alice.png)
-
-![Bob](static/BOB.png)
+<img src="static/Main_screen.png" width="600"/>
+<img src="static/Alice.png" width="100"/>
+<img src="static/BOB.png" width="100"/>
