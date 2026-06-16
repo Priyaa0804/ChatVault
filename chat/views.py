@@ -1,13 +1,19 @@
 from django.shortcuts import render, redirect
 from chat.models import Room, Message
+from chat.forms import CustomUserCreationForm
 from django.http import JsonResponse, HttpResponse
+from django.contrib.auth import authenticate, login
+from django.db import IntegrityError
+
 
 def home(request):
     return render(request, 'home.html')
 
+
 def room(request, room):
     username = request.GET.get('username')
     return render(request, 'room.html', {'username': username, 'room': room})
+
 
 def checkview(request):
     room = request.POST['room_name']
@@ -20,6 +26,7 @@ def checkview(request):
         new_room.save()
         return redirect('/'+room+'/?username='+username)
 
+
 def send(request):
     username = request.POST['username']
     room = request.POST['room_id']
@@ -27,6 +34,7 @@ def send(request):
     new_message = Message.objects.create(value=message, user=username, room=room)
     new_message.save()
     return HttpResponse('Message sent!')
+
 
 def getMessages(request, room):
     messages = Message.objects.filter(room=room)
@@ -38,3 +46,28 @@ def getMessages(request, room):
             'date': str(msg.date),
         })
     return JsonResponse({'messages': messageList})
+
+
+def signup_view(request):
+    if request.method == 'POST':
+        form = CustomUserCreationForm(request.POST)
+        if form.is_valid():
+            try:
+                form.save()
+                return redirect('login')
+            except IntegrityError:
+                form.add_error('email', 'This email is already registered.')
+    else:
+        form = CustomUserCreationForm()
+
+    return render(request, 'signup.html', {'form': form})
+
+def login_view(request):
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            return redirect('home')
+    return render(request, 'login.html')
