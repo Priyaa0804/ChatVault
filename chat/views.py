@@ -1,11 +1,14 @@
-from django.shortcuts import render, redirect
-from chat.models import Room, Message
+from django.shortcuts import render, redirect, get_object_or_404
+from chat.models import Room, Message, CustomUser
 from chat.forms import CustomUserCreationForm
 from django.http import JsonResponse, HttpResponse
 from django.contrib.auth import authenticate, login
 from django.db import IntegrityError
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import logout
 
 
+@login_required
 def home(request):
     return render(request, 'home.html')
 
@@ -71,3 +74,12 @@ def login_view(request):
             login(request, user)
             return redirect('home')
     return render(request, 'login.html')
+
+def logout_view(request):
+    logout(request)
+    return redirect('login')
+
+@login_required
+def profile_view(request, username):
+    profile_user = get_object_or_404(CustomUser, username=username)
+    return render(request, 'profile.html', {'profile_user': profile_user})

@@ -102,8 +102,9 @@ body {
         <input type="text" name="username" id="username" width="100px" />
         <input type="submit" value="Enter Room">
     </form>
-</div>
 
+</div>
+<a href="{% url 'logout' %}" onclick="return confirm('Are you sure you want to logout?')">Logout</a>
 
 </body>
 
