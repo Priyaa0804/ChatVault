@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from chat.models import Room, Message, CustomUser
-from chat.forms import CustomUserCreationForm
+from chat.forms import CustomUserCreationForm, ProfileEditForm
 from django.http import JsonResponse, HttpResponse
 from django.contrib.auth import authenticate, login
 from django.db import IntegrityError
@@ -83,3 +83,14 @@ def logout_view(request):
 def profile_view(request, username):
     profile_user = get_object_or_404(CustomUser, username=username)
     return render(request, 'profile.html', {'profile_user': profile_user})
+
+@login_required
+def profile_edit_view(request):
+    if request.method == 'POST':
+        form = ProfileEditForm(request.POST, request.FILES, instance=request.user)
+        if form.is_valid():
+            form.save()
+            return redirect('profile', username=request.user.username)
+    else:
+        form = ProfileEditForm(instance=request.user)
+    return render(request, 'profile_edit.html', {'form': form})
